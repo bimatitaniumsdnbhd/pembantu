@@ -83,6 +83,17 @@ function waLink(phone, text){
 
 async function init(){
   try{
+    // quick standalone reachability check before touching auth,
+    // so we can tell a network/DNS block apart from a real auth error
+    try{
+      await fetch(SUPABASE_URL + '/auth/v1/health', { method:'GET' });
+    }catch(netErr){
+      document.getElementById('app').innerHTML =
+        '<div class="empty" style="color:var(--red)">Cannot reach Supabase at all from this network/browser.'+
+        '<br><br>Try: (1) switch off Wi-Fi and use mobile data instead, (2) try a different browser, (3) disable any VPN or ad blocker for this site.'+
+        '<br><br>Technical detail: ' + (netErr.message || netErr) + '</div>';
+      return;
+    }
     const { data, error } = await sb.auth.getSession();
     if(error) throw error;
     state.session = data.session;
