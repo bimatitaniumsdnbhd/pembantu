@@ -43,12 +43,13 @@
   .mono{font-family:'IBM Plex Mono',monospace;}
   .wrap{max-width:960px;margin:0 auto;padding:26px 20px 80px;}
   h1,h2,h3{font-family:'Space Grotesk',sans-serif;font-weight:600;margin:0;}
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+  header{display:flex;align-items:center;justify-space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
   .brand{display:flex;align-items:center;gap:10px;}
   .brand-mark{width:34px;height:34px;background:var(--indigo);border-radius:8px;position:relative;flex:none;}
   .brand-mark::after{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 12px 12px 0;border-color:transparent var(--marigold) transparent transparent;border-top-right-radius:8px;}
   .brand h1{font-size:19px;}
   .brand span{display:block;font-size:12px;color:var(--sub);margin-top:1px;}
+  .header-actions{display:flex;align-items:center;gap:10px;}
   .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
   .tabs button{border:0.5px solid var(--line);background:var(--card);padding:9px 16px;border-radius:999px;font-size:13px;font-weight:500;color:var(--sub);cursor:pointer;}
   .tabs button.active{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-bg);}
@@ -56,8 +57,9 @@
   input:focus{outline:none;border-color:var(--indigo);box-shadow:0 0 0 3px rgba(47,75,124,0.12);}
   label{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;}
   .panel{background:var(--card);border:0.5px solid var(--line);border-radius:var(--radius);padding:22px;max-width:400px;margin:0 auto;}
-  .btn{border:0.5px solid var(--indigo);background:var(--indigo);color:#fff;padding:10px 16px;border-radius:10px;font-weight:500;font-size:13px;cursor:pointer;}
+  .btn{border:0.5px solid var(--indigo);background:var(--indigo);color:#fff;padding:10px 16px;border-radius:10px;font-weight:500;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block;}
   .btn.ghost{background:transparent;color:var(--indigo);}
+  .btn.sub{background:var(--marigold);border-color:var(--marigold);color:#fff;}
   .btn.wa{background:var(--green);border-color:var(--green);}
   .btn.block{width:100%;margin-top:16px;}
   .err{color:var(--red);font-size:12px;margin-top:8px;}
@@ -195,7 +197,11 @@ function render(){
         <div class="brand-mark"></div>
         <div><h1>Pembantu</h1><span>Order tracking &amp; WhatsApp reminders for your shop</span></div>
       </div>
-      ${state.session ? `<button class="signout" onclick="signOutUser()">Sign out</button>` : ''}
+      ${state.session ? `
+        <div class="header-actions">
+          <a class="btn sub" href="YOUR_STRIPE_PAYMENT_LINK_HERE" target="_blank">Subscribe</a>
+          <button class="signout" onclick="signOutUser()">Sign out</button>
+        </div>` : ''}
     </header>`;
 
   if(!state.session){
