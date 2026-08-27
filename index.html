@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   // ---- 1. PASTE YOUR FIREBASE CONFIG HERE ----
@@ -27,7 +27,7 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  window.__fb = { auth, db, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, fbSignOut, collection, doc, setDoc, addDoc, updateDoc, query, where, onSnapshot };
+  window.__fb = { auth, db, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, fbSignOut, collection, doc, setDoc, addDoc, updateDoc, query, where, onSnapshot };
   window.__fbReady = true;
   window.dispatchEvent(new Event('fb-ready'));
 </script>
@@ -77,6 +77,7 @@
   tr:last-child td{border-bottom:none;}
   .search{max-width:280px;margin-bottom:14px;}
   .signout{background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;}
+  .link-btn{background:none;border:none;color:var(--indigo);font-size:13px;cursor:pointer;margin-top:14px;display:block;width:100%;text-align:center;}
 </style>
 </head>
 <body>
@@ -144,6 +145,20 @@ async function signIn(){
 
 async function signOutUser(){ await window.__fb.fbSignOut(window.__fb.auth); }
 
+async function resetPassword(){
+  const fb = window.__fb;
+  const errBox = document.getElementById('auth-err');
+  if(!authDraft.email.trim()){ errBox.style.color='var(--red)'; errBox.textContent = 'Enter your email above first, then click "Forgot password".'; return; }
+  try{
+    await fb.sendPasswordResetEmail(fb.auth, authDraft.email.trim());
+    errBox.style.color = 'var(--green)';
+    errBox.textContent = 'Password reset email sent — check your inbox.';
+  }catch(e){
+    errBox.style.color = 'var(--red)';
+    errBox.textContent = e.message;
+  }
+}
+
 async function submitOrder(){
   const fb = window.__fb;
   const errBox = document.getElementById('new-err');
@@ -197,6 +212,7 @@ function render(){
         <input type="password" value="${authDraft.password}" oninput="authDraft.password=this.value" placeholder="At least 6 characters">
         <div class="err" id="auth-err"></div>
         <button class="btn block" onclick="${state.authMode==='signin' ? 'signIn()' : 'signUp()'}">${state.authMode==='signin' ? 'Sign in' : 'Create shop account'}</button>
+        ${state.authMode==='signin' ? `<button class="link-btn" onclick="resetPassword()">Forgot password?</button>` : ''}
       </div>`;
     return;
   }
