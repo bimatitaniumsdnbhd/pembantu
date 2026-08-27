@@ -9,10 +9,9 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   // ---- 1. PASTE YOUR FIREBASE CONFIG HERE ----
-  // Firebase console > Project settings > General > Your apps > SDK setup and configuration
   const firebaseConfig = {
     apiKey: "AIzaSyAa2do4ngvHNVzf3qT1pxyc_HElAOeaj_g",
     authDomain: "pembantu-be6fb.firebaseapp.com",
@@ -27,7 +26,7 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  window.__fb = { auth, db, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, fbSignOut, collection, doc, setDoc, addDoc, updateDoc, query, where, onSnapshot };
+  window.__fb = { auth, db, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, fbSignOut, collection, doc, setDoc, getDoc, addDoc, updateDoc, query, where, onSnapshot };
   window.__fbReady = true;
   window.dispatchEvent(new Event('fb-ready'));
 </script>
@@ -43,7 +42,7 @@
   .mono{font-family:'IBM Plex Mono',monospace;}
   .wrap{max-width:960px;margin:0 auto;padding:26px 20px 80px;}
   h1,h2,h3{font-family:'Space Grotesk',sans-serif;font-weight:600;margin:0;}
-  header{display:flex;align-items:center;justify-space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
   .brand{display:flex;align-items:center;gap:10px;}
   .brand-mark{width:34px;height:34px;background:var(--indigo);border-radius:8px;position:relative;flex:none;}
   .brand-mark::after{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 12px 12px 0;border-color:transparent var(--marigold) transparent transparent;border-top-right-radius:8px;}
@@ -86,7 +85,7 @@
 <div class="wrap" id="app"><div class="empty">Loading…</div></div>
 
 <script>
-const state = { session:null, tab:'new', orders:[], search:'', authMode:'signin', ready:false };
+const state = { session:null, shopData:null, tab:'new', orders:[], search:'', authMode:'signin', ready:false };
 const draft = { name:'', phone:'', item:'', price:'', readyDate:'' };
 const authDraft = { email:'', password:'', shopName:'' };
 const STATUS_LABEL = { received:'Received', ready:'Ready for pickup', collected:'Collected' };
@@ -100,11 +99,30 @@ function waLink(phone, text){
   return 'https://wa.me/' + p + '?text=' + encodeURIComponent(text);
 }
 
+function getTrialStatus(createdAt){
+  if(!createdAt) return { active: true, daysLeft: 14 };
+  const fourteenDaysMs = 14 * 24 * 60 * 60 * 1000;
+  const expiresAt = createdAt + fourteenDaysMs;
+  const now = Date.now();
+  const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+  return {
+    active: now < expiresAt,
+    daysLeft: daysLeft > 0 ? daysLeft : 0
+  };
+}
+
 function boot(){
   const fb = window.__fb;
-  fb.onAuthStateChanged(fb.auth, (user) => {
+  fb.onAuthStateChanged(fb.auth, async (user) => {
     state.session = user;
     if(user){
+      try {
+        const docSnap = await fb.getDoc(fb.doc(fb.db, 'shops', user.uid));
+        if (docSnap.exists()) {
+          state.shopData = docSnap.data();
+        }
+      } catch(e) {}
+
       const q = fb.query(fb.collection(fb.db, 'orders'), fb.where('shopId', '==', user.uid));
       if(unsubOrders) unsubOrders();
       unsubOrders = fb.onSnapshot(q, (snap) => {
@@ -116,6 +134,7 @@ function boot(){
     } else {
       if(unsubOrders) unsubOrders();
       state.orders = [];
+      state.shopData = null;
     }
     state.ready = true;
     render();
@@ -133,7 +152,10 @@ async function signUp(){
   if(!authDraft.email.trim() || !authDraft.password){ errBox.textContent = 'Enter email and password.'; return; }
   try{
     const cred = await fb.createUserWithEmailAndPassword(fb.auth, authDraft.email.trim(), authDraft.password);
-    await fb.setDoc(fb.doc(fb.db, 'shops', cred.user.uid), { shopName: authDraft.shopName.trim() });
+    await fb.setDoc(fb.doc(fb.db, 'shops', cred.user.uid), { 
+      shopName: authDraft.shopName.trim(),
+      createdAt: Date.now()
+    });
   }catch(e){ errBox.textContent = e.message; }
 }
 
@@ -185,12 +207,17 @@ async function submitOrder(){
 
 async function advanceStatus(id, status){
   const fb = window.__fb;
-  await fb.updateDoc(fb.doc(fb.db, 'orders', id), { status });
+  await fb.updateDoc(fb.doc(fb.doc(fb.db, 'orders', id)), { status });
 }
 
 function render(){
   const app = document.getElementById('app');
   if(!state.ready){ app.innerHTML = '<div class="empty">Loading…</div>'; return; }
+
+  const trial = getTrialStatus(state.shopData?.createdAt);
+  const trialBadge = trial.active 
+    ? `<span style="font-size:12px;color:var(--sub);">${trial.daysLeft} days left in trial</span>`
+    : `<span style="font-size:12px;color:var(--red);font-weight:600">Trial expired</span>`;
 
   const header = `<header>
       <div class="brand">
@@ -199,6 +226,7 @@ function render(){
       </div>
       ${state.session ? `
         <div class="header-actions">
+          ${trialBadge}
           <a class="btn sub" href="https://buy.stripe.com/7sY9AV65r5lAbgZb7McMM01" target="_blank">Subscribe</a>
           <button class="signout" onclick="signOutUser()">Sign out</button>
         </div>` : ''}
@@ -219,6 +247,16 @@ function render(){
         <div class="err" id="auth-err"></div>
         <button class="btn block" onclick="${state.authMode==='signin' ? 'signIn()' : 'signUp()'}">${state.authMode==='signin' ? 'Sign in' : 'Create shop account'}</button>
         ${state.authMode==='signin' ? `<button class="link-btn" onclick="resetPassword()">Forgot password?</button>` : ''}
+      </div>`;
+    return;
+  }
+
+  if(!trial.active){
+    app.innerHTML = header + `
+      <div class="panel" style="text-align:center; max-width:480px;">
+        <h2>Your 14-day free trial has ended</h2>
+        <p style="color:var(--sub); margin:12px 0 20px; font-size:14px; line-height:1.5;">Subscribe to Pembantu for RM49/month to continue managing customer orders and sending automated WhatsApp notifications.</p>
+        <a class="btn sub block" href="https://buy.stripe.com/7sY9AV65r5lAbgZb7McMM01" target="_blank">Subscribe Now</a>
       </div>`;
     return;
   }
@@ -280,7 +318,7 @@ function render(){
   app.innerHTML = html;
 }
 </script>
-  <footer style="margin-top: 40px; text-align: center; font-size: 12px; color: var(--sub);">
+<footer style="margin-top: 40px; text-align: center; font-size: 12px; color: var(--sub);">
   <a href="/terms.html" style="color: var(--sub); margin-right: 12px;">Terms of Service</a>
   <a href="/privacy.html" style="color: var(--sub);">Privacy Policy</a>
 </footer>
