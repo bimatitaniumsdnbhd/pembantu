@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pembantu — 1-Click WhatsApp Order Tracking for Service Shops</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F2F4F0;
+      --ink: #1C2B24;
+      --sub: #5B685F;
+      --line: #DCE1D8;
+      --card: #FFFFFF;
+      --indigo: #2F4B7C;
+      --indigo-bg: #EAF0FA;
+      --marigold: #E0932C;
+      --green: #278854;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+    }
+    h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin: 0; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 30px 20px 80px; }
+    
+    /* Header */
+    nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 36px; height: 36px; background: var(--indigo); border-radius: 10px; position: relative;
+    }
+    .brand-mark::after {
+      content:''; position: absolute; top:0; right:0; width:0; height:0;
+      border-style:solid; border-width:0 12px 12px 0;
+      border-color:transparent var(--marigold) transparent transparent;
+      border-top-right-radius:10px;
+    }
+    .brand-title { font-size: 20px; font-weight: 700; }
+    .btn {
+      background: var(--indigo); color: #fff; padding: 12px 20px; border-radius: 10px;
+      font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block;
+      transition: transform 0.1s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.primary-cta { background: var(--green); font-size: 16px; padding: 14px 28px; }
+    
+    /* Hero */
+    .hero { text-align: center; margin-bottom: 40px; }
+    .pill {
+      display: inline-block; background: var(--indigo-bg); color: var(--indigo);
+      font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 999px; margin-bottom: 16px;
+    }
+    .hero h1 { font-size: 38px; line-height: 1.25; margin-bottom: 16px; letter-spacing: -0.02em; }
+    .hero p { font-size: 18px; color: var(--sub); max-width: 620px; margin: 0 auto 28px; }
+
+    /* Video Container */
+    .video-card {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 60px;
+    }
+    .video-aspect {
+      width: 100%; aspect-ratio: 16/9; background: #1C2B24; border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #fff; text-align: center; padding: 20px; position: relative; overflow: hidden;
+    }
+    .play-icon {
+      width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+    }
+
+    /* Benefits */
+    .benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 60px; }
+    @media (max-width: 680px) { .benefits { grid-template-columns: 1fr; } .hero h1 { font-size: 28px; } }
+    .b-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+    .b-card h3 { font-size: 16px; margin-bottom: 8px; color: var(--ink); }
+    .b-card p { font-size: 14px; color: var(--sub); margin: 0; }
+
+    /* Conversion CTA Box */
+    .cta-box {
+      background: var(--indigo); color: #fff; border-radius: var(--radius);
+      padding: 40px 24px; text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-box h2 { font-size: 28px; margin-bottom: 12px; color: #fff; }
+    .cta-box p { color: #DCE1D8; font-size: 16px; max-width: 500px; margin: 0 auto 24px; }
+    .guarantee { font-size: 12px; color: #A0B2D6; margin-top: 14px; }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <!-- Navbar -->
+    <nav>
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <span class="brand-title">Pembantu</span>
+      </div>
+      <a href="https://pembantu.me" class="btn">Sign In</a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <span class="pill">Built for Service Shops &amp; Micro-Sellers</span>
+      <h1>Stop Typing Manual WhatsApp Messages to Every Customer</h1>
+      <p>Log orders in 5 seconds, keep your customer queue organized, and trigger pre-filled WhatsApp readiness alerts with a single tap.</p>
+    </section>
+
+    <!-- Video Placeholder -->
+    <div class="video-card">
+      <div class="video-aspect">
+        <!-- REPLACE THIS DIV WITH YOUR LOOM EMBED / IFRAME ONCE RECORDED -->
+        <div class="play-icon">▶</div>
+        <p style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Watch how Pembantu saves 2+ hours daily</p>
+        <p style="font-size: 13px; color: #A0B2D6; margin: 0;">30-Second Mobile Demo</p>
+      </div>
+    </div>
+
+    <!-- Key Benefit Pillars -->
+    <section class="benefits">
+      <div class="b-card">
+        <h3>⚡ 1-Tap WhatsApp Alerts</h3>
+        <p>No typing customer phone numbers or copying standard messages. Click one button to launch WhatsApp directly with order details pre-filled.</p>
+      </div>
+      <div class="b-card">
+        <h3>📋 Visual Order Board</h3>
+        <p>Never lose track of a job card or miss a promise date again. Track jobs clearly across Received, Ready, and Collected stages.</p>
+      </div>
+      <div class="b-card">
+        <h3>👥 Instant Customer Log</h3>
+        <p>Automatically save every customer’s purchase history and total spent so you always recognize your returning loyal clients.</p>
+      </div>
+    </section>
+
+    <!-- Final High-Converting CTA Box -->
+    <section class="cta-box">
+      <h2>Ready to Streamline Your Shop Counter?</h2>
+      <p>Try Pembantu free for 7 days. Setup takes under 60 seconds with zero software installation required.</p>
+      <a href="https://pembantu.me" class="btn primary-cta">Start Your 7-Day Free Trial →</a>
+      <div class="guarantee">No credit card required • RM49/month after trial • Cancel anytime</div>
+    </section>
+
+  </div>
+
+</body>
+</html>
